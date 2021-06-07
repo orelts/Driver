@@ -10,6 +10,7 @@ class Driver(Sabertooth):
     def __init__(self):
         super(Driver, self).__init__()
         self.last_err = 1
+        self.speed_ratio = 10
 
     ## this function uses the 2 following functions to preform a manuever in when given a driving distance and rotating
     ## angle. first it rotates and then drives.
@@ -83,11 +84,9 @@ class Driver(Sabertooth):
     ## this function calculates the duration of the drive according to the length needed to be driven.
     def drive_distance(self, distance, speed=100):
         print("speed in drive distance is {}".format(speed))
-        # if speed == 0:
-        #     return
-        # # duration = distance/ speed
-        # # start = time.time()
-        dur = 2
+        if speed == 0:
+            return
+        dur = distance / (speed * self.speed_ratio)
         try:
             print("driving speed {}".format(speed))
             self.drive_forward(speed, duration=dur)
