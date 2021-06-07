@@ -3,7 +3,7 @@ from sabertooth import *
 from sql.sql_config import *
 import keyboard
 
-conn, cursor = connect_to_db()
+
 
 
 class Driver(Sabertooth):
@@ -107,6 +107,18 @@ if __name__ == '__main__':
     ## the driver module forever awates driving and lifting commands.
     ## when a driving command is loaded to the SQL, the driver parses it and extracts the speed,distance and angle of driving.
     ## the driver then uses the above functions to send the commands to the lynxmotion and sabertooth modules.
+    conn, cursor = connect_to_db()
+    init_database(cursor, conn)
+    init_sql_table(cursor, conn, "driver", d_driver, False)
+
+    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
+    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
+    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
+    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
+    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
+    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
+    print_sql_row(cursor, "driver")
+
     driver = Driver()
     while True:
         try:
