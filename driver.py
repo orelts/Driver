@@ -70,11 +70,16 @@ class Driver(Sabertooth):
                     print("right with speed {}".format(ctl_speed))
                     self.turn_right(ctl_speed, 2, True)
             driver.stop()
+
             vals = get_top_table_elem(cursor, "heading_", "SensorsInfo", values_for_mean)
             finished_actual = [int(item) for item in vals]
             finished_actual = sum(finished_actual)/len(finished_actual)
+            if is_at_edge:
+                finished_diff = 360 - abs(initial_heading - finished_actual)
+            else:
+                finished_diff = abs(initial_heading - finished_actual)
 
-            self.last_err = self.last_err * (target / finished_actual)
+            self.last_err = self.last_err * (abs(angle) / finished_diff)
 
         except Exception as e:
             self.stop()
