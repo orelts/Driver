@@ -12,7 +12,7 @@ class Driver(Sabertooth):
         self.last_err = 1
         self.speed_ratio = 10
 
-    ## this function uses the 2 following functions to preform a manuever in when given a driving distance and rotating
+    ## this function uses the 2 following functions to preform a manuever when given a driving distance and rotating
     ## angle. first it rotates and then drives.
     def handle_command(self, angle, distance=5, rotation_speed=50, driving_speed=50):
         try:
@@ -30,6 +30,9 @@ class Driver(Sabertooth):
     #     self.turn_left(speed, 1.5, False)
     ## this function uses the readings from the pixhawk to determine how much the robot needs to turn.
     ## it gets the initial heading and calculates the final heading. when it reaches the final heading the robot stops.
+    ## the function has an internal controller that slows rotating speed when approaching the desired angle.
+    ## it also finds the average of the last 5 heading in order to get more accurate results.
+    ## since mis-accuracy can happen from time to time, we store the lastest error and act according to it when calculating the rotation
     def rotate_in_angle(self, angle, speed=100):
         values_for_mean = 5
         if speed == 0:
@@ -108,9 +111,7 @@ class Driver(Sabertooth):
 
 
 if __name__ == '__main__':
-    ## the driver module forever awates driving and lifting commands.
-    ## when a driving command is loaded to the SQL, the driver parses it and extracts the speed,distance and angle of driving.
-    ## the driver then uses the above functions to send the commands to the lynxmotion and sabertooth modules.
+    ## initiation of table in the SQL to hold a specimen of driving commands
     conn, cursor = connect_to_db()
     init_database(cursor, conn)
     init_sql_table(cursor, conn, "driver", d_driver, False)
@@ -123,14 +124,19 @@ if __name__ == '__main__':
     update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
     print_sql_row(cursor, "driver")
 
+    ## the driver module forever awates driving and lifting commands.
+    ## when a driving command is loaded to the SQL, the driver parses it and extracts the speed,distance and angle of driving.
+    ## the driver then uses the above functions to send the commands to the lynxmotion and sabertooth modules.
     driver = Driver()
     while True:
         try:
+            ## get the next row that hasnt been executed yet
             curr_ID ,new_command = get_row_by_condition(cursor, "is_commited=0", "driver")
             print(new_command)
             if new_command is None:
                 continue
-
+            
+            ## extract angle,speed and driving distance from the row
             angle_ = get_column_idx(cursor, "driver", "angle")
             angle = new_command[0][angle_]
             speed_ = get_column_idx(cursor, "driver", "speed")
@@ -138,12 +144,14 @@ if __name__ == '__main__':
             distance_ = get_column_idx(cursor, "driver", "distance")
             distance = new_command[0][distance_]
             try:
+                ## execute cpmmand
                 driver.handle_command(int(angle), int(distance), int(speed), int(speed))
                 print("finished command?")
             except Exception as drv_cmd_err:
                 print("driving command with ID={} failed".format(curr_ID))
                 raise drv_cmd_err
             print("finished command?!")
+            ## update the row to executed status
             set_element_in_row(cursor, "is_commited", curr_ID, "driver", "1")
         except Exception as e:
             driver.stop()
