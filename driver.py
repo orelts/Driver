@@ -10,7 +10,7 @@ class Driver(Sabertooth):
     def __init__(self):
         super(Driver, self).__init__()
         self.last_err = 1
-        self.speed_ratio = 10
+        self.speed_ratio = 0.0065
 
     ## this function uses the 2 following functions to preform a manuever when given a driving distance and rotating
     ## angle. first it rotates and then drives.
@@ -34,7 +34,7 @@ class Driver(Sabertooth):
     ## it also finds the average of the last 5 heading in order to get more accurate results.
     ## since mis-accuracy can happen from time to time, we store the lastest error and act according to it when calculating the rotation
     def rotate_in_angle(self, angle, speed=100):
-        values_for_mean = 5
+        values_for_mean = 1
         if speed == 0:
             return
         try:
@@ -58,7 +58,8 @@ class Driver(Sabertooth):
                     diff = 360 - abs(initial_heading - curr)
                 else:
                     diff = abs(initial_heading - curr)
-
+                print("error = {}".format(self.last_err))
+                print("diff = {}".format(diff))
                 # print("diff is {}".format(diff))
                 if diff >= 0.95 * abs(angle):
                     break
@@ -67,10 +68,8 @@ class Driver(Sabertooth):
                 if ctl_speed < 30:
                     ctl_speed = 30
                 if angle < 0:  # rotate left
-                    print("left with speed {}".format(ctl_speed))
                     self.turn_left(ctl_speed, 2, True)
                 else:
-                    print("right with speed {}".format(ctl_speed))
                     self.turn_right(ctl_speed, 2, True)
             driver.stop()
 
@@ -114,14 +113,14 @@ if __name__ == '__main__':
     ## initiation of table in the SQL to hold a specimen of driving commands
     conn, cursor = connect_to_db()
     init_database(cursor, conn)
+    drop_table(cursor,conn, "driver")
     init_sql_table(cursor, conn, "driver", d_driver, False)
+    update_sql(cursor, conn, "driver", (45, 60, 0.8, "0"), False, d_driver)
+    update_sql(cursor, conn, "driver", (45, 60, 0.8, "0"), False, d_driver)
+    update_sql(cursor, conn, "driver", (-45, 60, 0.8, "0"), False, d_driver)
+    update_sql(cursor, conn, "driver", (-45, 60, 0.8, "0"), False, d_driver)
 
-    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
-    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
-    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
-    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
-    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
-    update_sql(cursor, conn, "driver", (90, 60, 5, "0"), False, d_driver)
+
     print_sql_row(cursor, "driver")
 
     ## the driver module forever awates driving and lifting commands.
@@ -144,12 +143,16 @@ if __name__ == '__main__':
             distance_ = get_column_idx(cursor, "driver", "distance")
             distance = new_command[0][distance_]
             try:
+
                 ## execute cpmmand
                 driver.handle_command(int(angle), int(distance), int(speed), int(speed))
+
+                driver.handle_command(int(angle), float(distance), int(speed), int(speed))
+
                 print("finished command?")
             except Exception as drv_cmd_err:
                 print("driving command with ID={} failed".format(curr_ID))
-                raise drv_cmd_err
+                print(drv_cmd_err)
             print("finished command?!")
             ## update the row to executed status
             set_element_in_row(cursor, "is_commited", curr_ID, "driver", "1")

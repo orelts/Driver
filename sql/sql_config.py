@@ -154,8 +154,8 @@ def get_column_idx(curs, table_name, field):
 
 ## printing updated sql data in a dict way (Column, row). optional to choose table name and number of last rows to print
 def print_sql_row(curs, table_name="SensorsInfo", num_of_last_rows=None):
-    if num_of_last_rows == None:
-        table_rows = curs.execute("SELECT TOP " + str(num_of_last_rows) + " FROM " + table_name + " ORDER BY ID DESC")
+    if num_of_last_rows is not None:
+        table_rows = curs.execute("SELECT TOP " + str(num_of_last_rows) + " * FROM " + table_name + " ORDER BY ID DESC")
     else:
         table_rows = curs.execute("SELECT * FROM " + table_name)
     columns = [column[0] for column in curs.description]
