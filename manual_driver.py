@@ -4,7 +4,6 @@ import time
 
 from crane import lynxmotion
 
-## manual
 ## entering manual driving mode by pressing 'enter', exiting by pressing 'escape'
 ## arrows control the direction of movement
 ## WASD control the crane

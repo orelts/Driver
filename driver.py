@@ -3,7 +3,9 @@ from sabertooth import *
 from sql.sql_config import *
 import keyboard
 
-
+"""!
+@brief driver: class implementation for initialization and activation of the driver.
+"""
 
 
 class Driver(Sabertooth):
@@ -32,7 +34,9 @@ class Driver(Sabertooth):
     ## it gets the initial heading and calculates the final heading. when it reaches the final heading the robot stops.
     ## the function has an internal controller that slows rotating speed when approaching the desired angle.
     ## it also finds the average of the last 5 heading in order to get more accurate results.
-    ## since mis-accuracy can happen from time to time, we store the lastest error and act according to it when calculating the rotation
+    ## since mis-accuracy can happen from time to time, we store the lastest error and act according to it when calculating the rotation.
+    ## the storage of the error also enables the robot to learn the terrain it is on. it would have different friction on ground
+    ## and floor for example, and thus needs to rotate differently.
     def rotate_in_angle(self, angle, speed=100):
         values_for_mean = 1
         if speed == 0:
@@ -40,7 +44,7 @@ class Driver(Sabertooth):
         try:
             vals = get_top_table_elem(cursor, "heading_", "SensorsInfo", values_for_mean)
             initial_heading = [int(item) for item in vals]
-            initial_heading = sum(initial_heading)/len(initial_heading)
+            initial_heading = sum(initial_heading)/len(initial_heading) # calculate initial heading according to 5 previous readings
 
             curr = initial_heading
             diff = 0
@@ -51,7 +55,7 @@ class Driver(Sabertooth):
                 last = curr
                 vals = get_top_table_elem(cursor, "heading_", "SensorsInfo", values_for_mean)
                 curr = [int(item) for item in vals]
-                curr = sum(curr) / len(curr)
+                curr = sum(curr) / len(curr) # current heading
                 if abs(last - curr) > 300:
                     is_at_edge = True
                 if is_at_edge:
@@ -61,7 +65,7 @@ class Driver(Sabertooth):
                 print("error = {}".format(self.last_err))
                 print("diff = {}".format(diff))
                 # print("diff is {}".format(diff))
-                if diff >= 0.95 * abs(angle):
+                if diff >= 0.95 * abs(angle): # if reached specified angle, stop.
                     break
                 err = abs(angle) - diff
                 ctl_speed = int(speed * err / abs(angle)) + 15
@@ -76,7 +80,7 @@ class Driver(Sabertooth):
             vals = get_top_table_elem(cursor, "heading_", "SensorsInfo", values_for_mean)
             finished_actual = [int(item) for item in vals]
             finished_actual = sum(finished_actual)/len(finished_actual)
-            if is_at_edge:
+            if is_at_edge: # if exceeds 360 degrees, do a different calculation to know heading
                 finished_diff = 360 - abs(initial_heading - finished_actual)
             else:
                 finished_diff = abs(initial_heading - finished_actual)
