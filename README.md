@@ -1,12 +1,15 @@
 # Driver
+
+<p align="center">
+ <img src="./assets/Driver.gif" height="300" width="300">
+</p>
+
+
 Implementation of driving reading commands from sql and driving controll algorithms for robot
 in this project we implemented the basic infrastructure for the world cleaner robot. 
 This robot can drive with given speed and rotate in different angles.  The driving operations are implemented using basic control that is needed for more accurate angle rotation.
 
 
-<p align="center">
- <img src="./assets/Driver.gif" height="300" width="300">
-</p>
 
 
 - [Driver](#driver)
