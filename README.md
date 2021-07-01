@@ -1,13 +1,13 @@
 # Driver
+Implementation of driving reading commands from sql and driving controll algorithms for robot
+in this project we implemented the basic infrastructure for the world cleaner robot. 
+This robot can drive with given speed and rotate in different angles.  The driving operations are implemented using basic control that is needed for more accurate angle rotation.
 
 
 <p align="center">
  <img src="./assets/Driver.gif" height="300" width="300">
 </p>
 
-
-in this project we implemented the basic infrastructure for the world cleaner robot. 
-This robot can drive with given speed and rotate in different angles.  The driving operations are implemented using basic control that is needed for more accurate angle rotation.
 
 - [Driver](#driver)
   * [Further Work](#further-work)

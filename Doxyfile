@@ -44,7 +44,7 @@ PROJECT_NUMBER         = 1
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "Driver Module, implementing driving reading commands from sql and driving controll algorithms"
+PROJECT_BRIEF          = "Driver Module"
 
 
 
@@ -54,7 +54,7 @@ PROJECT_BRIEF          = "Driver Module, implementing driving reading commands f
 # pixels and the maximum width should not exceed 200 pixels. Doxygen will copy
 # the logo to the output directory.
 
-PROJECT_LOGO           = assets/Driver.gif
+PROJECT_LOGO           = assets/visl.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
